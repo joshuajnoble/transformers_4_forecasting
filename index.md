@@ -48,7 +48,11 @@ First, we want to turn our data into properly timestamped data with stations and
 
 First things first with a time series, we need to check that it's stationary and non-seasonal. First up, an empirical visual inspection:
 
+Monthly:
+
 ![Monthly](/images/monthly_values.png)
+
+Hourly:
 
 ![Hourly](/images/hourly_values.png)
 
@@ -65,7 +69,7 @@ Feature 6 wd: 3120.139781
 Feature 7 station: 428.761398
 ```
 
-CO is strongly predictive of PM2.5 and stations are not. But, let's think a bit about this: we could guess that air pollution in one part of the city might be worse than others. It *could* be tempting to flatten everything down to remove the distinctions of the stations but we should also make sure that our stations aren't significant when treated like a time series. One way of doing this is to use Dynamic Time Warping to see how different our time series are from one another. 
+CO is strongly predictive of PM2.5 and stations are not. But let's think a bit about this: we could guess that air pollution in one part of the city might be worse than others. It *could* be tempting to flatten everything down to remove the distinctions of the stations but we should also make sure that our stations aren't significant when treated like a time series. One way of doing this is to use Dynamic Time Warping to see how different our time series are from one another. 
 
 What we want from dynamic time warping is a metric of how much we would need to move one single valued time series in order to make it match another. In this case, a Euclidean distance is simple and easily interpretable:
 
@@ -93,7 +97,16 @@ This generates the following:
 
 ![Image](/images/dtw_results.png)
 
-We can see that some of our stations are closer than others, that is, those which have a lower distance show similarities in their time series patterns. So, there are two approaches we can take now: we can either throw all the data at our different models to see how they navigate the different sites or we can train different models on each of our sites and use an ensemble to weight predictions from each model. The promise of deep learning is that we *can* do the former, so for this article we will try that and do the second in a follow-up.
+We can see that some of our stations are closer than others, that is, those which have a lower distance show similarities in their time series patterns. 
+
+Let's pick 2 that seem different, stations 3 and 6, and see how different they really are:
+
+![Image](/images/station_comparison.png)
+
+Seems different enough to be interesting. After all, we're trying to challenge our models here.
+
+
+So, there are two approaches we can take now: we can either throw all the data at our different models to see how they navigate the different sites or we can train different models on each of our sites and use an ensemble to weight predictions from each model. The promise of deep learning is that we *can* do the former, so for this article we will try that and do the second in a follow-up.
 
 #Training our models
 
@@ -334,6 +347,58 @@ NBEATs doesn't use future covariates, while TFT does. The TCN doesn't use static
 
 Now the great reveal, how did they do per site?
 
-![Our results]('/images/results.png')
+![Our results](/images/results.png)
 
-So our Naive Drift is quite good, worryingly good in fact. The only model that outperforms it is our Temporal Fusion Transformer. The Temporal Convolutional Network is treated a bit unfairly by our dataset because it doesn't account for the relationships between multiple covariates and static covariates well enough to keep up with the complexity of our dataset. NHits seems to do fairly well in this shoot-out, likely because the hierarchical nature of the time series windows that it examines can catch the fairly sudden changes in PM2.5. 
+So our Naive Drift is quite good, worryingly good in fact. The only model that outperforms it is our Temporal Fusion Transformer. The Temporal Convolutional Network is treated a bit unfairly by our dataset because it doesn't account for the relationships between multiple covariates and static covariates well enough to keep up with the complexity of our dataset. NHits seems to do fairly well in this shoot-out, likely because the hierarchical nature of the time series windows that it examines can catch the fairly sudden changes in PM2.5.
+
+There's an interesting way that I've found insightful to understand what might be going on when testing forecasting models that we can try out: how different are the errors from the target values? E.g. do the errors themselves _track_ the target value? E.g. is our model _failing_ to catch spikes or anomalies in our data or our covariates?
+
+![DTW between errors and target](/images/dtw_err_vs_target.png)
+
+As we might guess, since our TCN model is performing so poorly, the errors that model produces track the actual target values. When PM2.5 goes up, so does our error, when it goes down, so does our error rate. This is a nice way to catch our models that might look good because they just pick the mean over and over again. While that might minimize the RMSE, it's not a sign of a good forecasting model. Our best performing model, the TFT, tends to not have its errors tracking the values. Whatever it's doing wrong, it's doing it wrong in a slightly more interesting way.
+
+Let's open it up to a broader and wider prediction test by expanding the target series that we evaluate against from 10% of the testing set to 50% of the testing set:
+
+```
+start_location = 0.5
+
+naive_backtest_series = nd_model.backtest(test_target_series, 
+                                          start=start_location, 
+                                          metric=rmse, 
+                                          reduction=None)
+
+tft_backtest_series = tftmodel.backtest(series = test_target_series,
+                                        past_covariates=cov_series,
+                                        future_covariates=test_cov_series,
+                                        retrain=False,
+                                        metric=rmse,
+                                        start=start_location,
+                                        num_samples=100,
+                                        reduction=None)
+
+# rest of the models backtested below...
+```
+
+Now we can see how our models stack up:
+
+![Longer test](/images/longer_test_rmse.png)
+
+So our TFT still just barely beats the naive drift and the other models still look more or less the same. How much better is our TFT than just a drift? 
+
+```
+np.mean(mean_rmse(tft_backtest_series)) - np.mean(mean_rmse(naive_backtest_series))
+```
+
+We get back `-0.2236660970731279`, not a resounding victory but promising. Moreover, let's see if we can figure out what's going on in our testing. Here's the PM2.5 values compared to the error rates:
+
+![Errors vs Target](/images/errors_vs_target_1.png)
+
+We can see a few interesting things here: none of our models truly seem catch the big spikes but some of them recover much more quickly than others. That's part of why the Naive drift does so well: when the PM2.5 drops quickly, it drops along with it quite quickly as well. Other models are still using up too much of the past. That could probably be corrected by shortening the windows that these models use for their inputs.
+
+We could zoom in a little on our models and see what they look like at a particularly spicy time (both for predicting, and for breathing):
+
+![Errors vs Target](/images/errors_vs_target_2.png)
+
+Here we start to get a bit better picture of what might be going on in the middle of our prediction period: the wind blows in some bad air and then dies down. One of our wind directions seems to have a correlation with the PM2.5 when paired with a strong enough wind speed. When the wind shifts to a different direction, after a short lag, the spike dies down. There's also likely something else going on that our data isn't capturing either, but a good forecasting model will capture some of the data while also being flexible to the trends. 
+
+![Errors vs Target](/images/errors_vs_target_2.png)
