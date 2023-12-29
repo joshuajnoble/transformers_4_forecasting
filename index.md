@@ -44,7 +44,7 @@ First, we want to turn our data into properly timestamped data with stations and
 |4|2013|3|1|4|3\.0|3\.0|12\.0|12\.0|300\.0|72\.0|-2\.0|1025\.2|-19\.5|0\.0|1\.0|2\.0|0|2013-03-01 04:00:00|
 
 
-[Data formatting code here](/forecasting_eda.ipynb#Data_Formatting)
+[Data formatting code here](https://github.com/joshuajnoble/transformers_4_forecasting/blob/1020c588a55b721d90fad8a96703054ffbef69aa//#Data_Formatting)
 
 First things first with a time series, we need to check that it's stationary and non-seasonal. First up, an empirical visual inspection:
 
