@@ -31,7 +31,7 @@ Our models should be able to forecast PM2.5 for a given station using historical
 
 We have hourly readings from 6 different sites in the Beijing area. The fact that this dataset contains multiple different time series makes it a bit more complex and challenging than a typical time series dataset. First off, we should look to see what our timeseries data looks like, whether it's seasonal and stationary, and then we can look to see what these different stations mean for us:
 
-To keep this blogpost from being a complete mass of code, I'm going to just point to specific parts of the notebook files in places and instead discuss the results.
+To keep this blogpost from being an absolute wall of code, I'm going to just point to specific parts of the notebook files in places and instead discuss the results.
 
 First, we want to turn our data into properly timestamped data with stations and wind direction as indices rather than strings:
 
@@ -411,4 +411,6 @@ Looks like we have some strong correlations that our models (hopefully) can pick
 
 # Wrap Up
 
-The Temporal Fusion Transformer seems to be our winner by a nose over the Naive Drift. That may be disappointing but we're using really challenging data that has significant spikes in it and any model that out-performs a baseline drift is a significant win in my book. There are some strategies that we probably _should_ use to deal with this and I'm going to keep playing with this data and do another short little article on this soon. 
+The Temporal Fusion Transformer seems to be our winner by a nose over the Naive Drift. That may be disappointing but we're using really challenging data that has significant spikes in it and any model that out-performs a baseline drift is a significant win in my book. Are Transformers really that bad at predicting? Well with this dataset, compared to D-Linear, no, they don't seem to be. Is bigger always better? Not necessarily, but the TFT is one of the more complex model architectures out there. However, throwing more covariates at it likely isn't going to help. We saw that the windspeed and wind-direction were likely the strongest correlations (with a lag) to the PM2.5, so one could take a guess that pulling out just that data might give us slightly better predictive power in our models.
+
+There are some strategies that we probably _should_ use to deal with this and I'm going to keep playing with this data and do another short little article on this soon. 
