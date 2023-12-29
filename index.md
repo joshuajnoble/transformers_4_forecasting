@@ -1,9 +1,9 @@
 
-Forecasting and _Bigger is Better_?
+## Forecasting and _Bigger is Better_?
 
 Do you like predicting the future? Of course you do. You'll be a billionaire, you'll save the planet, you'll wait until just the right moment to buy that plane ticket, the list goes on. Of course, actually predicting the future is a bit more boring than that. Most of the time we want to predict things like when machine on a production line might start failing or when there might be a spike in demand for electricity. We call this kind of prediction "forecasting" and while it does predict the future, a far better way of thinking about it is that it carefully examines the past for patterns and projects those into the future. This means that your past data, the time series data which represents the past of the thing you're trying to predict, is vitally important. Poor historical data = poor future predictions. Good historical data = good future predictions. 
 
-Transformers for forecasting
+## Transformers for forecasting
 
 Transformers definitely are not the only way to do time series forecasting, but they are a really interesting way to approach it. You're almost certainly familiar with Transformers from NLP applications and there the name of the game almost always is "bigger". Bigger means better and better means more generative ability, better translations, better summarization. Here's a question though: is it the same in long-term time series forecasting? I've always been curious about this as I once spent a lot of time working on [forecasting eviction rates](https://joshuajnoble.github.io/w210site/) and our approach in that project was to work with [an NBEATS architecture](https://arxiv.org/abs/1905.10437)
 
@@ -17,7 +17,7 @@ Put a little more pointedly:
 > ...we pose the following intriguing question: Are Transformers really effective for long-term time series forecasting?
 
 
-They tested against several SOTA transformer architectures: FEDformer [31], Autoformer [28], Informer [30], Pyraformer [18], and LogTrans [16] and found that what they describe as " a set of embarrassingly simple one-layer linear models named LTSF-Linear" outperforms many of these architectures on canonical time series datasets. Their paper is excellent and I'd highly encourage you to give it a skim. This feels to me like a wonderful question to probe a bit on: with a complex dataset which has multiple covariates and multiple locations.
+They tested against several SOTA transformer architectures: FEDformer, Autoformer, Informer, Pyraformer, and LogTrans and found that what they describe as "a set of embarrassingly simple one-layer linear models named LTSF-Linear" outperforms many of these architectures on canonical time series datasets. Their paper is excellent and I'd highly encourage you to give it a skim. This feels to me like a wonderful question to probe a bit on: with a complex dataset which has multiple covariates and multiple locations.
 
 So first, our dataset: [the Beijing Air Quality dataset](https://archive.ics.uci.edu/dataset/501/beijing+multi+site+air+quality+data)
 
@@ -46,6 +46,12 @@ First, we want to turn our data into properly timestamped data with stations and
 |4|2013|3|1|4|3\.0|3\.0|12\.0|12\.0|300\.0|72\.0|-2\.0|1025\.2|-19\.5|0\.0|1\.0|2\.0|0|2013-03-01 04:00:00|
 
 
+First things first with a time series, we need to check that it's stationary and non-seasonal. First up, an empirical visual inspection:
+
+![Monthly](/images/monthly_values.png)
+
+![Hourly](/images/hourly_values.png)
+
 Next, we can use the `SelectKBest` to look at what affects PM2.5
 
 ```
@@ -59,7 +65,7 @@ Feature 6 wd: 3120.139781
 Feature 7 station: 428.761398
 ```
 
-CO is strongly predictive of PM2.5 and stations are not, however we can guess that air pollution in one part of the city might be worse than others. It could be tempting to flatten everything down to remove the distinctions of the stations but we should also make sure that our stations aren't significant when treated like a time series. One way of doing this is to use Dynamic Time Warping to see how different our time series are from one another. 
+CO is strongly predictive of PM2.5 and stations are not. But, let's think a bit about this: we could guess that air pollution in one part of the city might be worse than others. It *could* be tempting to flatten everything down to remove the distinctions of the stations but we should also make sure that our stations aren't significant when treated like a time series. One way of doing this is to use Dynamic Time Warping to see how different our time series are from one another. 
 
 What we want from dynamic time warping is a metric of how much we would need to move one single valued time series in order to make it match another. In this case, a Euclidean distance is simple and easily interpretable:
 
@@ -85,7 +91,7 @@ sns.heatmap(dist_mat)
 
 This generates the following:
 
-[Image](dtw_results.png)
+![Image](/images/dtw_results.png)
 
 We can see that some of our stations are closer than others, that is, those which have a lower distance show similarities in their time series patterns. So, there are two approaches we can take now: we can either throw all the data at our different models to see how they navigate the different sites or we can train different models on each of our sites and use an ensemble to weight predictions from each model. The promise of deep learning is that we *can* do the former, so for this article we will try that and do the second in a follow-up.
 
@@ -328,6 +334,6 @@ NBEATs doesn't use future covariates, while TFT does. The TCN doesn't use static
 
 Now the great reveal, how did they do per site?
 
-![Our results]('images/results.png')
+![Our results]('/images/results.png')
 
 So our Naive Drift is quite good, worryingly good in fact. The only model that outperforms it is our Temporal Fusion Transformer. The Temporal Convolutional Network is treated a bit unfairly by our dataset because it doesn't account for the relationships between multiple covariates and static covariates well enough to keep up with the complexity of our dataset. NHits seems to do fairly well in this shoot-out, likely because the hierarchical nature of the time series windows that it examines can catch the fairly sudden changes in PM2.5. 
