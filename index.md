@@ -399,6 +399,8 @@ We could zoom in a little on our models and see what they look like at a particu
 
 ![Errors vs Target](/images/errors_vs_target_2.png)
 
-Here we start to get a bit better picture of what might be going on in the middle of our prediction period: the wind blows in some bad air and then dies down. One of our wind directions seems to have a correlation with the PM2.5 when paired with a strong enough wind speed. When the wind shifts to a different direction, after a short lag, the spike dies down. There's also likely something else going on that our data isn't capturing either, but a good forecasting model will capture some of the data while also being flexible to the trends. 
+Here we start to get a bit better picture of what might be going on in the middle of our prediction period: the wind blows in some bad air and then dies down. One of our wind directions seems to have a correlation with the PM2.5 when paired with a strong enough wind speed. When the wind shifts to a different direction, after a short lag, the spike dies down. There's also likely something else going on that our data isn't capturing either, but a good forecasting model will capture some of the data while also being flexible to the trends.
+
+
 
 ![Errors vs Target](/images/errors_vs_target_2.png)
