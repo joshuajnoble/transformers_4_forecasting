@@ -44,6 +44,8 @@ First, we want to turn our data into properly timestamped data with stations and
 |4|2013|3|1|4|3\.0|3\.0|12\.0|12\.0|300\.0|72\.0|-2\.0|1025\.2|-19\.5|0\.0|1\.0|2\.0|0|2013-03-01 04:00:00|
 
 
+[Data munging code](forecasting_eda.ipynb#data_formatting)
+
 First things first with a time series, we need to check that it's stationary and non-seasonal. First up, an empirical visual inspection:
 
 Monthly:
@@ -413,4 +415,4 @@ Looks like we have some strong correlations that our models (hopefully) can pick
 
 The Temporal Fusion Transformer seems to be our winner by a nose over the Naive Drift. That may be disappointing but we're using really challenging data that has significant spikes in it and any model that out-performs a baseline drift is a significant win in my book. Are Transformers really that bad at predicting? Well with this dataset, compared to D-Linear, no, they don't seem to be. Is bigger always better? Not necessarily, but the TFT is one of the more complex model architectures out there. However, throwing more covariates at it likely isn't going to help. We saw that the windspeed and wind-direction were likely the strongest correlations (with a lag) to the PM2.5, so one could take a guess that pulling out just that data might give us slightly better predictive power in our models.
 
-There are some strategies that we probably _should_ use to deal with this and I'm going to keep playing with this data and do another short little article on this soon. 
+There are some strategies that we probably _should_ use to deal with this and I'm going to keep playing with this data and do another short little article on this *soon*. 
