@@ -329,7 +329,7 @@ nd_model.fit(past_target_series[0])
 
 If our models don't perform a Naive Drift, we know they're not really doing their job (or that we haven't done them justice).
 
-#Evaluating:
+# Evaluating:
 
 For each of these models we'll use the DARTs `backtest()` method to see how well it can predict each of our 11 sites. The backteset computes error values that the model would have produced when used on (potentially multiple) series. We're not going to let our models retrain at each step because I don't have that many Colab credits and my AWS piggybank is empty, hence `retrain=False`. We also want to not test on our entire testing set, for the sake of time, so I'm passing `start=0.9` to use 90% of the testing time series. The backtest uses each historical forecast to compute error scores which in this case will be RMSE. The calls for each of our models are going to look very similar with a few small differences for the model architectures:
 
@@ -391,14 +391,24 @@ We get back `-0.2236660970731279`, not a resounding victory but promising. Moreo
 
 ![Errors vs Target](/images/errors_vs_target_1.png)
 
-We can see a few interesting things here: none of our models truly seem catch the big spikes but some of them recover much more quickly than others. That's part of why the Naive drift does so well: when the PM2.5 drops quickly, it drops along with it quite quickly as well. Other models are still using up too much of the past. That could probably be corrected by shortening the windows that these models use for their inputs.
+We can see a few interesting things here. First, the data has a lot of challenging features. Second, one of our models truly seem catch the big spikes but some of them recover much more quickly than others. That's part of why the Naive drift does so well: when the PM2.5 drops quickly, it drops along with it quite quickly as well. Other models are still using up too much of the past. That could probably be corrected by shortening the windows that these models use for their inputs. 
 
-We could zoom in a little on our models and see what they look like at a particularly spicy time (both for predicting, and for breathing):
+We could zoom in a little on our models (time indices 900 - 1100) and see what they look like at a particularly spicy time (both for predicting, and for breathing):
 
 ![Errors vs Target](/images/errors_vs_target_2.png)
 
 Here we start to get a bit better picture of what might be going on in the middle of our prediction period: the wind blows in some bad air and then dies down. One of our wind directions seems to have a correlation with the PM2.5 when paired with a strong enough wind speed. When the wind shifts to a different direction, after a short lag, the spike dies down. There's also likely something else going on that our data isn't capturing either, but a good forecasting model will capture some of the data while also being flexible to the trends.
 
+We can look at a different time period (time indices 250 - 500) to confirm that this is in fact the case:
 
+![Errors vs Target](/images/errors_vs_target_3.png)
 
-![Errors vs Target](/images/errors_vs_target_2.png)
+Again, the wind direction and wind speed seem to affect the PM2.5 significantly. Some of our models seem to understand this, others don't but skip actually predicting, and some others seem to handle these relationships moderately well. To confirm that our suspicions are correct, let's normalize all the values for PM2.5, windspeed, and direction and then plot it:
+
+![Environmental Factors](/images/wind_values.png)
+
+Looks like we have some strong correlations that our models (hopefully) can pick up on.
+
+# Wrap Up
+
+The Temporal Fusion Transformer seems to be our winner by a nose over the Naive Drift. That may be disappointing but we're using really challenging data that has significant spikes in it and any model that out-performs a baseline drift is a significant win in my book. There are some strategies that we probably _should_ use to deal with this and I'm going to keep playing with this data and do another short little article on this soon. 
