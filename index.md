@@ -44,7 +44,7 @@ First, we want to turn our data into properly timestamped data with stations and
 |4|2013|3|1|4|3\.0|3\.0|12\.0|12\.0|300\.0|72\.0|-2\.0|1025\.2|-19\.5|0\.0|1\.0|2\.0|0|2013-03-01 04:00:00|
 
 
-[Data munging code](forecasting_eda.ipynb#data_formatting)
+[Data formatting code here](/forecasting_eda.ipynb#data_formatting)
 
 First things first with a time series, we need to check that it's stationary and non-seasonal. First up, an empirical visual inspection:
 
@@ -55,6 +55,9 @@ Monthly:
 Hourly:
 
 ![Hourly](/images/hourly_values.png)
+
+
+We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!)
 
 Next, we can use the `SelectKBest` to look at what affects PM2.5
 
