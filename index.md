@@ -1,3 +1,5 @@
+layout: page
+title: Transformers for Forecasting
 
 ## Forecasting and _Bigger is Better_?
 
