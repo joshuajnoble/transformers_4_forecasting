@@ -8,16 +8,14 @@ Transformers for forecasting
 Transformers definitely are not the only way to do time series forecasting, but they are a really interesting way to approach it. You're almost certainly familiar with Transformers from NLP applications and there the name of the game almost always is "bigger". Bigger means better and better means more generative ability, better translations, better summarization. Here's a question though: is it the same in long-term time series forecasting? I've always been curious about this as I once spent a lot of time working on [forecasting eviction rates](https://joshuajnoble.github.io/w210site/) and our approach in that project was to work with [an NBEATS architecture](https://arxiv.org/abs/1905.10437)
 
 Recently though I came across [a fascinating paper](https://arxiv.org/abs/2205.13504) that raised some interesting questions about the efficacy of transformers for forecasting:
+ 
+> ...in time series modeling, we are to extract the temporal relations in an ordered set of continuous points. While employing positional encoding and using tokens to embed sub-series in Transformers facilitate preserving some ordering information, the nature of the permutation-invariant self-attention mechanism inevitably results in temporal information loss 
 
-``` 
-...in time series modeling, we are to extract the temporal relations in an ordered set of continuous points. While employing positional encoding and using tokens to embed sub-series in Transformers facilitate preserving some ordering information, the nature of the permutation-invariant self-attention mechanism inevitably results in temporal information loss 
-```
 
 Put a little more pointedly:
 
-```
-...we pose the following intriguing question: Are Transformers really effective for long-term time series forecasting?
-```
+> ...we pose the following intriguing question: Are Transformers really effective for long-term time series forecasting?
+
 
 They tested against several SOTA transformer architectures: FEDformer [31], Autoformer [28], Informer [30], Pyraformer [18], and LogTrans [16] and found that what they describe as " a set of embarrassingly simple one-layer linear models named LTSF-Linear" outperforms many of these architectures on canonical time series datasets. Their paper is excellent and I'd highly encourage you to give it a skim. This feels to me like a wonderful question to probe a bit on: with a complex dataset which has multiple covariates and multiple locations.
 
@@ -65,7 +63,7 @@ CO is strongly predictive of PM2.5 and stations are not, however we can guess th
 
 What we want from dynamic time warping is a metric of how much we would need to move one single valued time series in order to make it match another. In this case, a Euclidean distance is simple and easily interpretable:
 
-'''
+```
 dist_mat = pd.DataFrame()
 
 for i in df['station'].unique():
@@ -83,7 +81,7 @@ for i in df['station'].unique():
 
 
 sns.heatmap(dist_mat)
-'''
+```
 
 This generates the following:
 
