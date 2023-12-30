@@ -44,7 +44,7 @@ First, we want to turn our data into properly timestamped data with stations and
 |4|2013|3|1|4|3\.0|3\.0|12\.0|12\.0|300\.0|72\.0|-2\.0|1025\.2|-19\.5|0\.0|1\.0|2\.0|0|2013-03-01 04:00:00|
 
 
-[Data formatting code here](https://github.com/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Data_Formatting)
+[Data formatting code here](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Data_Formatting)
 
 First things first with a time series, we need to check that it's stationary and non-seasonal. First up, an empirical visual inspection:
 
@@ -56,10 +56,11 @@ Hourly:
 
 ![Hourly](/images/hourly_values.png)
 
+Patterns, but nothing that indicates seasonality.
 
-We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!) [Stationarity](https://github.com/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Stationarity)
+We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!) [Stationarity](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Stationarity)
 
-Next, we can use the `SelectKBest` to look at what affects PM2.5 [SelectKBest](https://github.com/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#SelectKBest)
+Next, we can use the `SelectKBest` to look at what affects PM2.5 [SelectKBest](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#SelectKBest)
 
 ```
 Feature 2 CO: 550607.964325
@@ -112,7 +113,7 @@ So, there are two approaches we can take now: we can either throw all the data a
 
 # Training our models
 
-This next section lays out the training of our 5 models using DARTs:
+This next section lays out the training of our 5 models using DARTs. The code all lives [here](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb) but we have most of the code listed out here.
 
 ## Making some training data
 
@@ -382,6 +383,9 @@ tft_backtest_series = tftmodel.backtest(series = test_target_series,
 
 # rest of the models backtested below...
 ```
+
+[Model training](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/darts_model_training.ipynb)
+
 
 Now we can see how our models stack up:
 
