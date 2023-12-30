@@ -57,9 +57,9 @@ Hourly:
 ![Hourly](/images/hourly_values.png)
 
 
-We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!)
+We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!) [Stationarity](https://github.com/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Stationarity)
 
-Next, we can use the `SelectKBest` to look at what affects PM2.5
+Next, we can use the `SelectKBest` to look at what affects PM2.5 [SelectKBest](https://github.com/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#SelectKBest)
 
 ```
 Feature 2 CO: 550607.964325
@@ -108,10 +108,9 @@ Let's pick 2 that seem different, stations 3 and 6, and see how different they r
 
 Seems different enough to be interesting. After all, we're trying to challenge our models here.
 
-
 So, there are two approaches we can take now: we can either throw all the data at our different models to see how they navigate the different sites or we can train different models on each of our sites and use an ensemble to weight predictions from each model. The promise of deep learning is that we *can* do the former, so for this article we will try that and do the second in a follow-up.
 
-#Training our models
+# Training our models
 
 This next section lays out the training of our 5 models using DARTs:
 
@@ -149,6 +148,7 @@ past_target_series = []
 future_target_series = []
 test_target_series = []
 
+# we want to match what we had last time in trainig, test hasn't been seen by any model so that's good
 for ts in target_series:
     past_target_series.append(ts.slice(0, future_split_point)) #up to our 'present'
     future_target_series.append(ts.slice(0, val_split_point)) #up to our testing
@@ -159,15 +159,16 @@ past_cov_series = []
 future_cov_series = []
 test_cov_series = []
 
+# we'll use some of the past series, future series, and test series for our forecasts
 for ts in cov_series:
     past_cov_series.append(ts.slice(0, future_split_point)) #up to our 'present'
     future_cov_series.append(ts.slice(0, val_split_point)) #up to our testing
     test_cov_series.append(ts.slice(val_split_point, len(ts))) #hold out for testing
 
 
+#TCN doesn't use static covariates so we just have the station ID as covars in the time series
 non_static_cov = []
 
-#TCN doesn't use static covariates so we just have the station ID as covars in the time series
 for i in range(0, len(cov_series)):
     temp_series = TimeSeries.from_series(pd.DataFrame({'station':[i] * len(cov_series[i])}))
     non_static_cov.append(concatenate([cov_series[i], temp_series], axis=1))
