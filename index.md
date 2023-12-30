@@ -56,7 +56,7 @@ Hourly:
 
 ![Hourly](/images/hourly_values.png)
 
-Patterns, but nothing that indicates seasonality.
+Patterns present but nothing that indicates seasonality that we need to worry about.
 
 We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!) [Stationarity](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Stationarity)
 
@@ -210,7 +210,6 @@ model.fit(past_target_series,
 
 ```
 
-
 ## Training Temporal Convolutional Network
 
 A Temporal Convolutional Network is the same sort of convolutional network that you've probably heard of for working with images, but with the kernel modified to use time periods from the training time series. Typically the TCN consists of dilated 1D convolutional layers which models the values in the time series as causal relationships.
@@ -348,7 +347,7 @@ nbeats_backtest = nbeats_model.backtest(series = test_target_series,
                                   start=0.9)
 ```
 
-NBEATs doesn't use future covariates, while TFT does. The TCN doesn't use static covariates so we need to pass an array of timeseries with the station ID encoded as a covariate. Aside from that though, things are fairly uniform. If you're curious about the slight differences in calls, check out the Jupyter notebook.
+NBEATs doesn't use future covariates, while TFT does. The TCN doesn't use static covariates so we need to pass an array of timeseries with the station ID encoded as a covariate. Aside from that though, things are fairly uniform. If you're curious about the slight differences in calls, check out [the Jupyter notebook]((https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/model_testing.ipynb).
 
 Now the great reveal, how did they do per site?
 
@@ -420,6 +419,6 @@ Looks like we have some strong correlations that our models (hopefully) can pick
 
 # Wrap Up
 
-The Temporal Fusion Transformer seems to be our winner by a nose over the Naive Drift. That may be disappointing but we're using really challenging data that has significant spikes in it and any model that out-performs a baseline drift is a significant win in my book. Are Transformers really that bad at predicting? Well with this dataset, compared to D-Linear, no, they don't seem to be. Is bigger always better? Not necessarily, but the TFT is one of the more complex model architectures out there. However, throwing more covariates at it likely isn't going to help. We saw that the windspeed and wind-direction were likely the strongest correlations (with a lag) to the PM2.5, so one could take a guess that pulling out just that data might give us slightly better predictive power in our models.
+The Temporal Fusion Transformer seems to be our winner by a _nose_ over the Naive Drift. That may be disappointing but we're using really challenging data that has significant spikes in it and any model that out-performs a baseline drift is a significant win in my book. Are Transformers really that bad at predicting? Well with this dataset, compared to D-Linear, no, they don't seem to be. Is bigger always better? Not necessarily, but the TFT is one of the more complex model architectures out there. However, throwing more covariates at it likely isn't going to help. We saw that the windspeed and wind-direction were likely the strongest correlations (with a lag) to the PM2.5, so one could take a guess that pulling out just that data might give us slightly better predictive power in our models.
 
 There are some strategies that we probably _should_ use to deal with this and I'm going to keep playing with this data and do another short little article on this *soon*. 
