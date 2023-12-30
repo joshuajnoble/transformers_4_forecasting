@@ -1,6 +1,8 @@
 
 Do you like predicting the future? Of course you do. You'll be a billionaire, you'll save the planet, you'll wait until just the right moment to buy that plane ticket, the list goes on. Of course, actually predicting the future is a bit more boring than that. Most of the time we want to predict things like when machine on a production line might start failing or when there might be a spike in demand for electricity. We call this kind of prediction "forecasting" and while it does predict the future, a far better way of thinking about it is that it carefully examines the past for patterns and projects those into the future. This means that your past data, the time series data which represents the past of the thing you're trying to predict, is vitally important. Poor historical data = poor future predictions. Good historical data = good future predictions. 
 
+![Monthly](/images/header.png)
+
 ## Forecasting and _Bigger is Better_?
 
 Transformers definitely are not the only way to do time series forecasting, but they are a really interesting way to approach it. You're almost certainly familiar with Transformers from NLP applications and there the name of the game almost always is "bigger". Bigger means better and better means more generative ability, better translations, better summarization. Here's a question though: is it the same in long-term time series forecasting? I've always been curious about this as I once spent a lot of time working on [forecasting eviction rates](https://joshuajnoble.github.io/w210site/) and our approach in that project was to work with [an NBEATS architecture](https://arxiv.org/abs/1905.10437)
