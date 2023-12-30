@@ -386,7 +386,6 @@ tft_backtest_series = tftmodel.backtest(series = test_target_series,
 
 [Model training](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/darts_model_training.ipynb)
 
-
 Now we can see how our models stack up:
 
 ![Longer test](/images/longer_test_rmse.png)
