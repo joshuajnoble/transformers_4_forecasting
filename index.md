@@ -58,7 +58,13 @@ Hourly:
 
 ![Hourly](/images/hourly_values.png)
 
-Patterns present but nothing that indicates seasonality that we need to worry about.
+Patterns present but nothing that indicates seasonality that we need to worry about. Running `seasonal_decompose` gives us the following:
+
+```
+max : 10.28236607142857
+min : -8.78365956959707
+mean : 7.218984415827502e-17
+```
 
 We also check that this is stationary with a KPSS and ADF test (yay, good old fashioned stats!) [Stationarity](https://nbviewer.org/github/joshuajnoble/transformers_4_forecasting/blob/main/forecasting_eda.ipynb#Stationarity)
 
