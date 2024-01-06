@@ -403,11 +403,20 @@ So our TFT still just barely beats the naive drift and the other models still lo
 np.mean(mean_rmse(tft_backtest_series)) - np.mean(mean_rmse(naive_backtest_series))
 ```
 
-We get back `-0.2236660970731279`, not a resounding victory but promising. Moreover, let's see if we can figure out what's going on in our testing. Here's the PM2.5 values compared to the error rates:
+We get back `-0.2236660970731279`, not a resounding victory but promising. 
+
+### Why TFT?
+
+The TFT architecture explicitly recognizes static covariates (like our stations). It encodes them and feeds them into each Gated Residual Network along with selected and encoded variables from a multi-variate time series set. This means that at each step the TFT uses the static covariates in 3 locations: when weighting the variables that most influence the output it's trying to learn with the covariatese, when processing the temporal representations in its Sequence-to-Sequence layer, and when preparing the output of its Gated Residdal Network to pass to the attention mechanism. The weighting of each static covariate varies across each of these steps _and_ across all of the time steps, meaning that our station data can be very important sometimes (e.g. when the wind is blowing in a certain direction with a certain strength) and not at all in others. Because the TFT has a self-attention mechanism rather than purely positional attention mechanism, it can learn that some time steps in the time series are more important than others. 
+
+
+## Digging into the testing
+
+Let's look more closely what's going on in our testing. Here's the PM2.5 values compared to the error rates:
 
 ![Errors vs Target](/images/errors_vs_target_1.png)
 
-We can see a few interesting things here. First, the data has a lot of challenging features. Second, one of our models truly seem catch the big spikes but some of them recover much more quickly than others. That's part of why the Naive drift does so well: when the PM2.5 drops quickly, it drops along with it quite quickly as well. Other models are still using up too much of the past. That could probably be corrected by shortening the windows that these models use for their inputs. 
+We can see a few interesting things here. First, the data has a lot of challenging features: huge spikes, rapid drop-offs, long periods of relative inactivity. Second, one of our models truly seem catch the big spikes but some of them recover much more quickly than others. That's part of why the Naive drift does so well: when the PM2.5 drops quickly, it drops along with it quite quickly as well. Other models are still using up too much of the past. That could probably be corrected by shortening the windows that these models use for their inputs. 
 
 We could zoom in a little on our models (time indices 900 - 1100) and see what they look like at a particularly spicy time (both for predicting, and for breathing):
 
